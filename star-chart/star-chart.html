@@ -2,50 +2,50 @@
 <html>
 <head>
     <title>star chart</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
 </head>
 <body>
 
-    <div id="map"></div>
+    <div id="map">
+      <form onsubmit="return false">
+        <label>latitude</label>
+        <input id="lat" type="text" />
+        <label>longitude</label>
+        <input id="long" type="text" />
+        <button id="button" class="sent" font-family="Lato">submit</button>
+      </form>
+    </div>
 
     <script type="text/javascript">
-
         var width = window.innerWidth,
-            height = window.innerHeight;
-
+            height = window.innerHeight-50;
         var div = d3.select('#map'),
             svg = div.append('svg').attr('width', width).attr('height', height),
             grp = svg.append('g').attr('class', 'gmap');
-
         var rotate = {x: 0, y: 45};
-
         var projection = d3.geo.stereographic()
             .scale(width / 2)
             .translate([width / 2, height / 2])
             .clipAngle(90)
             .rotate([rotate.x / 2, -rotate.y / 2]);
-
         var path = d3.geo.path().projection(projection);
-
         var overlay = svg.selectAll('circle').data([rotate])
             .enter().append('circle')
             .attr('transform', 'translate(' + [width / 2, height / 2] + ')')
             .attr('r', width / 2)
             .attr('filter', 'url(#lightMe)')
             .attr('class', 'overlay');
-
         var globe = grp.selectAll('path.globe').data([{type: 'Sphere'}])
             .enter().append('path')
             .attr('class', 'globe')
             .attr('d', path);
-
         var graticule = d3.geo.graticule();
         grp.selectAll('path.graticule').data([graticule()])
             .enter().append('path')
             .attr('class', 'graticule')
             .attr('d', path);
-
             var dragBehavior = d3.behavior.drag()
                 .origin(Object)
                 .on('drag', function(d) {
@@ -54,25 +54,36 @@
                         return path(u) ? path(u) : 'M 10 10';
                     });
               });
-            overlay.call(dragBehavior);
-
-        d3.json("hyg.json", function(error, data) {
-          if (error) {
-            return error;
-          }
-          var scale = d3.scale.linear()
-                        .domain(d3.extent(data.features, function(d) {
-                          return d.properties.mag;
-                        }))
-                        .range([3, 1]);
-          path.pointRadius(function(d) {
-            return d.properties ? scale(d.properties.mag) : 1;
+          overlay.call(dragBehavior);
+          d3.json("hyg.json", function(error, data) {
+            if (error) {
+              return error;
+            };
+            grp.selectAll('path.star').data(data.features)
+               .enter().append('path')
+               .attr('class', 'star')
+               .attr('d', path);
           });
-          grp.selectAll('path.star').data(data.features)
-             .enter().append('path')
-             .attr('class', 'star')
-             .attr('d', path);
-        });
+          function loadStars() {
+            d3.selectAll('path.stars').remove();
+            var time = Date.now();
+            var lat = document.getElementById("lat").value.trim();
+            var long = document.getElementById("long").value.trim();
+            if (isNaN(lat) || isNan(long)) {
+              alert("Invalid latitude/longitude input");
+            } else {
+              d3.json("/data/" + time + "/" + lat + "/" + long, function(error, data) {
+                if (error) {
+                  return error;
+                };
+                grp.selectAll('path.star').data(data.features)
+                   .enter().append('path')
+                   .attr('class', 'star')
+                   .attr('d', path);
+              });
+            }
+          }
+          document.getElementById("button").addEventListener("click", loadStars, false);
     </script>
 </body>
 </html>
