@@ -4,8 +4,12 @@
     <link rel="stylesheet" type="text/css" href="NightVisiondemo.css">
     <link href="https://fonts.googleapis.com/css?family=Spectral+SC" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+    integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+    crossorigin=""></script>
   </head>
   <body>
     <div id="header">
@@ -15,12 +19,27 @@
     <form method="get" action="inserturlhere">
       <p class="info">Date <br/><input id='datePicker' type="date" name="date" /></p>
       <p class="info">Time <br/><input id='timePicker' type="time" name="time" /></p>
+      <div id="mapid"></div>
     </form>
     <script>
     var d = new Date();
     d.setHours(d.getHours()-5);
     document.getElementById('datePicker').valueAsDate = d;
     document.getElementById('timePicker').valueAsDate = d;
+    var mymap = L.map('mapid').setView([40.344, -74.652], 13);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.streets',
+    accessToken: 'pk.eyJ1IjoicGhpbGxpcHQiLCJhIjoiY2o5d2k2YTRvN245bjJ5bGc5aGJhYnQ1eiJ9.Yh7Az6WWWesDyhxnPIEYQg'
+    }).addTo(mymap);
+    var marker = L.marker([40.344, -74.652]).addTo(mymap);
+    marker.bindPopup("Current Location").openPopup();
+    function onMapClick(e) {
+        marker.setLatLng(e.latlng);
+        marker.bindPopup("Selected Location").openPopup();
+    }
+    mymap.on('click', onMapClick);
     </script>
   </body>
 </html>
