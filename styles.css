@@ -1,0 +1,32 @@
+body {
+    background-color: #eee;
+    margin: 0;
+    overflow: hidden;
+}
+
+#map {
+    width: 400px;
+    height: 400px;
+
+    display: block;
+}
+
+.graticule {
+    fill: none;
+    stroke: #0053ad;
+    stroke-width: 1px;
+}
+
+.globe {
+    fill: #060052;
+}
+
+.star {
+    fill: #ffffff;
+    fill-opacity: 0.9;
+}
+
+.overlay {
+    fill: #005fc7;
+    fill-opacity: 0.4;
+}
