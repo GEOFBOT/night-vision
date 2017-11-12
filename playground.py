@@ -29,6 +29,20 @@ def altaz_to_spherical(alt, az):
 
     return x, y, z
 
+
+def project(center_point, project_point):
+    OP = center_point
+    OQ = project_point
+    PQ = np.subtract(OQ, OP)
+    mag = lambda x: np.linalg.norm(x)
+    proj_PQ_on_OP = np.multiply(np.dot(PQ, OP) / np.power(mag(OP), 2), OP)
+    omega = np.subtract(PQ, proj_PQ_on_OP)
+    omega_hat = np.divide(omega, mag(omega))
+    theta = np.arccos(np.divide(np.dot(OP, OQ), mag(OP) * mag(OQ)))
+    PQ_prime = np.multiply(mag(OP) * np.tan(theta), omega_hat)
+    OP_prime = OP + PQ_prime
+    return OP_prime
+
 if __name__ == "__main__":
     planets = load('de421.bsp')
     # p = ['mercury', 'venus', 'mars',
@@ -50,21 +64,10 @@ if __name__ == "__main__":
 
     ax = plt.subplot(111, projection='3d')
     ax.set_aspect('equal')
-    for planet in p:
-        xs = []
-        ys = []
-        zs = []
-        obs = princeton.at(ts.utc(2010, 1, range(1, 100))).observe(planet)
+    ax.set_xlim([-1.0,1.0])
+    ax.set_ylim([-1.0,1.0])
+    ax.set_zlim([-1.0,1.0])
 
-        alt, az, d = obs.apparent().altaz()
-
-        alt_ = alt.radians
-        az_ = az.radians
-        x, y, z = altaz_to_spherical(alt_, az_)
-        xs.append(x)
-        ys.append(y)
-        zs.append(z)
-        ax.scatter(xs, ys, zs)
 
     alt__ = np.repeat([0.0], 20)
     az__ = np.arange(0.0, 2*np.pi, 2.0/20.0*np.pi)
@@ -78,6 +81,25 @@ if __name__ == "__main__":
     project_point = altaz_to_spherical(np.pi/3, np.pi / 4.0 + 0.2)
     ax.scatter(*project_point, marker='x')
 
+    for planet in p:
+        xs = []
+        ys = []
+        zs = []
+        obs = princeton.at(ts.utc(2010, 1, range(1, 100))).observe(planet)
+
+        alt, az, d = obs.apparent().altaz()
+
+        alt_ = alt.radians
+        az_ = az.radians
+        pt = altaz_to_spherical(alt_, az_)
+        # xs.append(pt[0])
+        # ys.append(pt[1])
+        # zs.append(pt[2])
+        for pt__ in zip(*pt):
+            ax.scatter(*project(center_point, pt__))
+        ax.scatter(*pt)
+
+
     # project vector from project_point to center_point on vector from origin to center_point
     # QP = np.subtract(center_point, project_point)
     # dot = np.dot(QP, center_point)
@@ -85,18 +107,7 @@ if __name__ == "__main__":
     # ax.scatter(*(project_point + projected), marker='+')
     # this projection is incorrect^
 
-    OP = center_point
-    OQ = project_point
-    PQ = np.subtract(OQ, OP)
-    mag = lambda x: np.linalg.norm(x)
-    proj_PQ_on_OP = np.multiply(np.dot(PQ, OP) / np.power(mag(OP), 2), OP)
-    omega = np.subtract(PQ, proj_PQ_on_OP)
-    omega_hat = np.divide(omega, mag(omega))
-    theta = np.arccos(np.divide(np.dot(OP, OQ), mag(OP) * mag(OQ)))
-    PQ_prime = np.multiply(mag(OP) * np.tan(theta), omega_hat)
-    OP_prime = OP + PQ_prime
-
-    ax.scatter(*OP_prime, marker='+')
+    ax.scatter(*project(center_point, project_point), marker='+')
     ax.scatter(0, 0, 0, marker='o')
 
 
