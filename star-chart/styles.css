@@ -1,7 +1,24 @@
 body {
-    background-color: #eee;
+    background-color: #eeeeee;
     margin: 0;
     overflow: hidden;
+}
+
+form {
+  padding: 10px;
+  position: absolute;
+  bottom: 0px;
+  margin-left: 28%;
+}
+form input {
+  padding: 5px;
+  margin-right: 10px;
+}
+
+label {
+  margin-left: 30px;
+  padding-right: 3px;
+  font-family: "Lato", "Times", sans-serif;
 }
 
 #map {

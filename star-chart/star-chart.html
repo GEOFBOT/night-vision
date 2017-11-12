@@ -55,21 +55,12 @@
                     });
               });
           overlay.call(dragBehavior);
-          d3.json("hyg.json", function(error, data) {
-            if (error) {
-              return error;
-            };
-            grp.selectAll('path.star').data(data.features)
-               .enter().append('path')
-               .attr('class', 'star')
-               .attr('d', path);
-          });
           function loadStars() {
             d3.selectAll('path.stars').remove();
             var time = Date.now();
             var lat = document.getElementById("lat").value.trim();
             var long = document.getElementById("long").value.trim();
-            if (isNaN(lat) || isNan(long)) {
+            if (isNaN(lat) || isNaN(long)) {
               alert("Invalid latitude/longitude input");
             } else {
               d3.json("/data/" + time + "/" + lat + "/" + long, function(error, data) {
