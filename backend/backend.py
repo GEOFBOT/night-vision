@@ -174,7 +174,7 @@ def get_data(time, lat, long):  # , azi, alt, radius):
         abort(404)
 
     location = earth + skyapi.Topos(lat, long)
-    dt = datetime.fromtimestamp(time)
+    dt = datetime.fromtimestamp(time // 1000)
     dt = dt.replace(tzinfo=skyapi.utc)
     t = ts.utc(dt)
 
